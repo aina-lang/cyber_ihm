@@ -22,7 +22,7 @@ export default function MyNavBar() {
     return (
         <Navbar fluid className="w-full shadow-md h-[74px] py-5 items-center absolute z-50"
         >
-            <Navbar.Brand href="https://flowbite-react.com">
+            <Navbar.Brand href="https://flowbite-react.com" className="space-x-5">
                 <div className="flex items-center">
                     <FiWifi className="mr-2 text-blue-400" />
                     <span className="self-center whitespace-nowrap text-sm dark:text-white">{wifiSpeed} Mbits/s (WiFi)</span>
