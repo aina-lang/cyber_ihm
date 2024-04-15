@@ -14,7 +14,7 @@ export default function DefaultLayout() {
           titleClassName="font-bold text-2xl text-white "
           titleSpanClassName={"text-orange-500"}
           titlePartOne={"Cyber"}
-          titlePartTwo={"Capmada"}
+          titlePartTwo={" unknow"}
         />
         <div className="p-4">
           <SidebarItem title={"Dashboard"}  icon={<HiChartPie/>}/>

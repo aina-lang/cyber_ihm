@@ -8,6 +8,7 @@ const SidebarGroupItem = ({ title, icon, children }) => {
 
   const handleClick = () => {
     setActiveGroup(activeGroup === title ? null : title);
+    console.log(activeGroup, title);
     setCollapsed(!collapsed);
   };
 
@@ -39,7 +40,10 @@ const SidebarGroupItem = ({ title, icon, children }) => {
       </button>
 
       <div className="pl-5">
-        {activeGroup === title && !collapsed && children}
+        {
+          // activeGroup === title &&
+          !collapsed && children
+        }
       </div>
     </div>
   );
