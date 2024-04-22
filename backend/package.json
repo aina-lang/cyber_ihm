@@ -1,0 +1,12 @@
+{
+  "dependencies": {
+    "arpscan": "^1.0.2",
+    "express": "^4.19.2",
+    "http-proxy": "^1.18.1",
+    "kickthemout": "^1.1.41",
+    "libnmap": "^0.4.19",
+    "local-devices": "^4.0.0",
+    "mongoose": "^8.3.2",
+    "speedtest-net": "^2.2.0"
+  }
+}

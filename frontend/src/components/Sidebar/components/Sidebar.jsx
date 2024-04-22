@@ -5,7 +5,7 @@ const Sidebar = ({ children }) => {
   const { collapsed } = useContext(SidebarContext);
 
   return (
-    <aside className={`bg-gray-900   ${collapsed ? 'w-[300px]' : 'w-[80px]'} h-full overflow-y-auto shadow-lg`}>
+    <aside className={`bg-gray-900  dark:bg-gray-800  ${collapsed ? 'w-[300px]' : 'w-[80px]'} h-full overflow-y-auto shadow-lg`}>
       <div className="">{children}</div>
     </aside>
   );

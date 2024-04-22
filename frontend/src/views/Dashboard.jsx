@@ -98,27 +98,37 @@ function Dashboard() {
 
   return (
     <div>
-      <BreadCumb subtitle={"Dashboard"} root={"Dashboard"} />
-      <div className="flex justify-between space-x-4 p-5 text-gray-700">
-  <div className="w-1/4 bg-white rounded-lg p-4 shadow-md text-gray-800">
-    <div className="text-xl font-semibold mb-2 text-gray-800">Postes connectés</div>
-    <p className="text-3xl font-bold text-gray-700">{totalConnections}</p>
-  </div>
-  <div className="w-1/4 bg-white rounded-lg p-4 shadow-md text-gray-800">
-    <div className="text-xl font-semibold mb-2 text-gray-800">Postes locaux utilisés</div>
-    <p className="text-3xl font-bold text-gray-700">{localPostsUsed}/12</p>
-  </div>
-  <div className="w-1/4 bg-white rounded-lg p-4 shadow-md text-gray-800">
-    <div className="text-xl font-semibold mb-2 text-gray-800">Postes invités</div>
-    <p className="text-3xl font-bold text-gray-700">{guestPosts}</p>
-  </div>
-  <div className="w-1/4 bg-white rounded-lg p-4 shadow-md text-gray-800">
-    <div className="text-xl font-semibold mb-2 text-gray-800">Connexions sur WiFi</div>
-    <p className="text-3xl font-bold text-gray-700">100</p>
-  </div>
-</div>
+      <BreadCumb subtitle={"Dashboard"} root={"Dashboard"} title={""} />
+      <div className="flex justify-between space-x-4  text-gray-700">
+        <div className="w-1/4 bg-white rounded-lg p-4 shadow-md text-gray-800">
+          <div className="text-xl font-semibold mb-2 text-gray-800">
+            Postes connectés
+          </div>
+          <p className="text-3xl font-bold text-gray-700">{totalConnections}</p>
+        </div>
+        <div className="w-1/4 bg-white rounded-lg p-4 shadow-md text-gray-800">
+          <div className="text-xl font-semibold mb-2 text-gray-800">
+            Postes locaux utilisés
+          </div>
+          <p className="text-3xl font-bold text-gray-700">
+            {localPostsUsed}/12
+          </p>
+        </div>
+        <div className="w-1/4 bg-white rounded-lg p-4 shadow-md text-gray-800">
+          <div className="text-xl font-semibold mb-2 text-gray-800">
+            Postes invités
+          </div>
+          <p className="text-3xl font-bold text-gray-700">{guestPosts}</p>
+        </div>
+        <div className="w-1/4 bg-white rounded-lg p-4 shadow-md text-gray-800">
+          <div className="text-xl font-semibold mb-2 text-gray-800">
+            Connexions sur WiFi
+          </div>
+          <p className="text-3xl font-bold text-gray-700">100</p>
+        </div>
+      </div>
 
-      <div className="grid grid-cols-2 gap-4 p-5">
+      <div className="grid grid-cols-2 gap-4 my-4">
         <div className="bg-white rounded-lg p-4 shadow-lg">
           <h2 className="text-xl font-semibold mb-4">
             Nombre de connexions par heure

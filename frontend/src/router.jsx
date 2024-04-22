@@ -3,6 +3,7 @@ import DefaultLayout from "./layouts/DefaultLayout";
 import { lazy } from "react";
 import NotFound from "./views/NotFound";
 import WifiUsersList from "./views/WifiUsersList";
+import CableUsersList from "./views/CableUsersList";
 
 const Dashboard = lazy(() => import("./views/Dashboard"));
 
@@ -18,6 +19,10 @@ export const router = createBrowserRouter([
       {
         path: "/wifi",
         element: <WifiUsersList/>,
+      },
+      {
+        path: "/cable",
+        element: <CableUsersList/>,
       },
     ],
   },
