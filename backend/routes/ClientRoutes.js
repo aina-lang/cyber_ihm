@@ -4,13 +4,16 @@ const express = require('express');
 const router = express.Router();
 const clientController = require('../controllers/ClientController');
 
-// Liste de tous les clients
 router.get('/clients', clientController.getAllClients);
 
-// Bloquer tous les clients
-router.put('/clients/block', clientController.blockAllClient);
+router.put('/clients/block', clientController.runBlockAllClientsOnce);
 
-// Débloquer tous les clients
 router.put('/clients/unblock', clientController.unblockAllClients);
+
+router.get('/clients/refresh', clientController.refreshClients);
+
+router.post('/clients', clientController.addClient);
+
+router.put('/clients/:clientId/unblock', clientController.unblockClientById);
 
 module.exports = router;

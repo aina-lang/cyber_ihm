@@ -13,6 +13,10 @@ const clientSchema = new mongoose.Schema({
         required: true,
         unique: true
     },
+    name: {
+        type: String
+    },
+   
     isRunning: {
         type: Boolean,
         default: false
