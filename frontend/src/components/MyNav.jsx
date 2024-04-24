@@ -8,7 +8,7 @@ export default function MyNavBar() {
   const [cableSpeed, setCableSpeed] = useState(0);
 
   const [darkTheme, setDarkTheme] = useState(() => {
-     return localStorage.getItem("theme") === "dark";
+    return localStorage.getItem("theme") === "dark";
   });
 
   useEffect(() => {
@@ -40,26 +40,32 @@ export default function MyNavBar() {
     return () => clearInterval(interval);
   }, []);
 
+  
   return (
     <Navbar
       fluid
-      className="w-full shadow-md h-[74px] py-5 items-center absolute z-50 dark:bg-gray-800"
+      className="w-full  shadow-md h-[74px] py-5 items-center absolute z-50 dark:bg-gray-800"
     >
       <Navbar.Brand href="https://flowbite-react.com" className="space-x-5">
+     
         <div className="flex items-center">
           <FiWifi className="mr-2 text-blue-400" />
           <span className="self-center whitespace-nowrap text-sm dark:text-white">
             {wifiSpeed} Mbits/s (WiFi)
           </span>
         </div>
-        <div className="flex items-center">
+        {/* <div className="flex items-center">
           <FiLink className="mr-2 text-green-400" />
           <span className="self-center whitespace-nowrap text-sm dark:text-white">
             {cableSpeed} Mbits/s (Câble)
           </span>
-        </div>
+        </div> */}
       </Navbar.Brand>
       <div className="flex md:order-2 items-center space-x-4">
+        {/* <div className="flex items-center space-x-4">
+          <span className="text-sm dark:text-white">{gatewayInfo.ip}</span>
+          <span className="text-sm dark:text-white">{gatewayInfo.mac}</span>
+        </div> */}
         <Switch
           checkedChildren="Dark"
           unCheckedChildren="Light"

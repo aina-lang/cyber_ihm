@@ -4,22 +4,37 @@ import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
 import { FloatButton } from "antd";
 import { FaEdit, FaTrashAlt, FaEye } from "react-icons/fa";
-import BreadCumb from "../components/BreadCumb";
+import { IoReload } from "react-icons/io5";
+import BreadCumb from "../components/BreadCumb.jsx";
 import { AG_GRID_LOCALE_FR } from "../config/local.js";
 import { FaPause, FaStop, FaPlus, FaMoneyBillWave } from "react-icons/fa";
 import FloatingButton from "../components/FloatingButton.jsx";
 import axios from "axios";
+import AddClientModal from "../components/AddClientModal.jsx";
+import { Tooltip } from "flowbite-react";
 
-const CableUsersList = () => {
+import Swal from 'sweetalert2'
+import withReactContent from 'sweetalert2-react-content'
+
+const MySwal = withReactContent(Swal);
+
+const LocalPost = () => {
   const [rowData, setRowData] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedRows, setSelectedRows] = useState([]);
+
+  const handleSelectionChanged = (event) => {
+    const selectedNodes = event.api.getSelectedNodes();
+    const selectedData = selectedNodes.map((node) => node.data);
+    setSelectedRows(selectedData);
+  };
 
   useEffect(() => {
-    // Fonction pour charger les données des clients depuis l'API
     const fetchClientsData = async () => {
       try {
-        const response = await axios.get("http://localhost:8000/api/clients/"); // Faites une requête GET à votre API pour récupérer les données des clients
+        const response = await axios.get("http://localhost:8000/api/clients/"); 
         console.log(response);
-        setRowData(response.data); // Mettez à jour l'état des données des clients avec les données reçues de l'API
+        setRowData(response.data); 
       } catch (error) {
         console.error(
           "Erreur lors de la récupération des données des clients :",
@@ -30,6 +45,31 @@ const CableUsersList = () => {
 
     fetchClientsData();
   }, []);
+
+  const handleDeleteAllClients = () => {
+    // Afficher la boîte de dialogue de confirmation
+    Swal.fire({
+      title: 'Êtes-vous sûr ?',
+      text: 'Cela effacera tous les clients ajoutés manuellement !',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Oui, effacer tout !'
+    }).then((result) => {
+      // Vérifier si l'utilisateur a cliqué sur le bouton de confirmation
+      if (result.isConfirmed) {
+        // Logique à exécuter si l'utilisateur a confirmé
+        // Par exemple, vous pouvez appeler une fonction pour effacer tous les clients ajoutés manuellement
+        deleteAllClients();
+      }
+    });
+  };
+  
+  // Fonction pour effacer tous les clients ajoutés manuellement
+  const deleteAllClients = () => {
+    // Insérer ici la logique pour effacer tous les clients ajoutés manuellement
+  };
 
   const columnDefs = [
     {
@@ -45,6 +85,8 @@ const CableUsersList = () => {
     {
       headerName: "Etat",
       field: "isRunning",
+      // resizable: false,
+      width:100,
       cellRenderer: (params) => (
         <div className="flex items-center justify-center">
           {params.value ? (
@@ -88,6 +130,8 @@ const CableUsersList = () => {
     {
       headerName: "Bloqué",
       field: "isBlocked",
+      // resizable: false,
+      width:120,
       cellRenderer: (params) => (
         <div className="flex items-center justify-center">
           {params.value ? (
@@ -180,12 +224,36 @@ const CableUsersList = () => {
   };
 
   return (
-    <div className="ag-theme-quartz" style={{ height: 350 }}>
+    <div className="ag-theme-quartz" style={{ height: 300 }}>
       <BreadCumb
-        title={"cable"}
+        title={"locaux"}
         root={"Dashboard"}
-        subtitle={"Postes par cable"}
+        subtitle={"Postes locaux"}
       />
+      <AddClientModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
+      <div className="w-full flex justify-between">
+        <Tooltip content="Ajouter un nouveau client" animation="duration-150">
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="bg-orange-500 hover:bg-orange-700  text-white font-bold py-2 px-4 rounded flex items-center mb-3 shadow-md"
+          >
+            <FaPlus className="mr-2" />
+            Nouveau poste
+          </button>
+        </Tooltip>
+        <Tooltip content="Actualiser la table " animation="duration-150">
+          {" "}
+          <button
+          onClick={handleDeleteAllClients}
+            className="bg-orange-500 hover:bg-orange-700  text-white font-bold py-2 px-4 rounded flex items-center mb-3 shadow-md"
+          >
+            <IoReload />
+          </button>
+        </Tooltip>
+      </div>
       <AgGridReact
         localeText={AG_GRID_LOCALE_FR}
         rowData={rowData}
@@ -196,30 +264,75 @@ const CableUsersList = () => {
         paginationPageSizeSelector={[10, 25, 50]}
         enableRangeSelection={true}
         rowSelection={"multiple"}
+        onSelectionChanged={handleSelectionChanged}
       />
       <div className="flex justify-start space-x-4 mt-4">
-        <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded flex items-center">
-          <FaPause className="mr-2" />
-          Pause
-        </button>
-        <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded flex items-center">
-          <FaStop className="mr-2" />
-          Stop
-        </button>
-        <button className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded flex items-center">
-          <FaMoneyBillWave className="mr-2" />
-          Facturer
-        </button>
+        <Tooltip
+          aria-disabled={!selectedRows.length}
+          content="Mettre en pause le compteur"
+          animation="duration-150"
+        >
+          <button
+            disabled={!selectedRows.length}
+            className={`bg-${
+              selectedRows.length ? "blue" : "gray"
+            }-500 hover:bg-${
+              selectedRows.length ? "blue" : ""
+            }-700 text-white font-bold py-2 px-4 rounded flex items-center`}
+          >
+            <FaPause className="mr-2" />
+            Pause
+          </button>
+        </Tooltip>
+        <Tooltip
+          aria-disabled={!selectedRows.length}
+          content="Stop le compteur"
+          animation="duration-150"
+        >
+          <button
+            disabled={!selectedRows.length}
+            className={`bg-${
+              selectedRows.length ? "red" : "gray"
+            }-500 hover:bg-${
+              selectedRows.length ? "red" : ""
+            }-700 text-white font-bold py-2 px-4 rounded flex items-center`}
+          >
+            <FaStop className="mr-2" />
+            Stop
+          </button>
+        </Tooltip>
+        <Tooltip
+          aria-disabled={!selectedRows.length}
+          content="Générer une facture PDF"
+          animation="duration-150"
+        >
+          <button
+            disabled={!selectedRows.length}
+            className={`bg-${
+              selectedRows.length ? "green" : "gray"
+            }-500 hover:bg-${
+              selectedRows.length ? "green" : ""
+            }-700 text-white font-bold py-2 px-4 rounded flex items-center`}
+          >
+            <FaMoneyBillWave className="mr-2" />
+            Facturer
+          </button>
+        </Tooltip>
       </div>
 
-      <FloatButton
-        icon={<FaPlus color="white" />}
-        className="h-[70px] w-[70px] bg-orange-500"
-        tooltip={<div> Nouveau postes</div>}
-        type="primary"
-      />
+      {/* <div className="absolute right-5 bottom-5">
+        <Tooltip content="Ajouter un nouveau client" animation="duration-150">
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="bg-orange-500 hover:bg-orange-700  text-white font-bold py-2 px-4 rounded flex items-center"
+          >
+            <FaPlus className="mr-2" />
+            Nouveau poste
+          </button>
+        </Tooltip>
+      </div> */}
     </div>
   );
 };
 
-export default CableUsersList;
+export default LocalPost;

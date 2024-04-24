@@ -2,8 +2,9 @@ import { createBrowserRouter } from "react-router-dom";
 import DefaultLayout from "./layouts/DefaultLayout";
 import { lazy } from "react";
 import NotFound from "./views/NotFound";
-import WifiUsersList from "./views/WifiUsersList";
-import CableUsersList from "./views/CableUsersList";
+import GuestPost from "./views/GuestPost";
+import ActivePost from "./views/ActivePost";
+
 
 const Dashboard = lazy(() => import("./views/Dashboard"));
 
@@ -17,12 +18,16 @@ export const router = createBrowserRouter([
         element: <Dashboard />,
       },
       {
-        path: "/wifi",
-        element: <WifiUsersList/>,
+        path: "/active",
+        element: <ActivePost/>,
       },
       {
-        path: "/cable",
-        element: <CableUsersList/>,
+        path: "/local",
+        element: <GuestPost/>,
+      },
+      {
+        path: "/guest",
+        element: <GuestPost/>,
       },
     ],
   },

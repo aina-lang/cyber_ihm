@@ -36,13 +36,13 @@ exports.getAllClients = async (req, res) => {
 exports.refreshClients = async (req, res) => {
   try {
     const options = {
-      interface: "wlan0",
+      interface: "eth0",
       command: "/usr/sbin/arp-scan",
       args: ["--localnet"],
       limit: 10,
       timeout: 5000,
     };
-
+  
     const devices = await arpScanner(options);
 
     console.log(devices);
@@ -108,25 +108,16 @@ const blockAllClients = async () => {
 // Fonction pour exécuter blockAllClients et répondre une fois avec un message JSON
 exports.runBlockAllClientsOnce = async (req, res) => {
   try {
-    const blockStatus = await BlockStatus.findOne();
-    await BlockStatus.create({ blockAllClientsCalled: true });
-    if (!blockStatus) {
-      // Créer un nouvel enregistrement s'il n'existe pas
-      console.log("yesss");
-      await BlockStatus.create({ blockAllClientsCalled: true });
-    } else {
-      // Mettre à jour l'état de blocage existant
-      blockStatus.blockAllClientsCalled = true;
-      await blockStatus.save();
-    }
+    // Récupérer les adresses IP des clients à bloquer
+    const { clientIps } = req.body;
 
-    const blockedClients = await Client.find({
-      isBlocked: true,
-      ipAddress: { $ne: gatewayIP },
-    });
+    // Marquer tous les clients comme bloqués dans la base de données
+    await Client.updateMany({ ipAddress: { $in: clientIps } }, { isBlocked: true });
 
-    const attackPromises = blockedClients.map(async (client) => {
-      console.log(client.ipAddress);
+    // Exécuter les commandes iptables pour bloquer les clients
+    const blockedClients = await Client.find({ ipAddress: { $in: clientIps } });
+
+    blockedClients.forEach(async (client) => {
       exec(
         `iptables -t filter -A FORWARD -s ${client.ipAddress} -j DROP`,
         (error, stdout, stderr) => {
@@ -159,16 +150,18 @@ exports.runBlockAllClientsOnce = async (req, res) => {
         }
       );
     });
-    attackPromises();
+
     res.json({
       message:
-        "Tous les clients ont été bloqués avec succès et une attaque a été lancée",
+        "Tous les clients ont été marqués comme bloqués dans la base de données et les attaques ont été lancées avec succès",
     });
   } catch (error) {
     console.error("Erreur lors de l'exécution de blockAllClientsOnce :", error);
     res.status(500).json({ message: "Erreur du serveur" });
   }
 };
+
+
 
 // Exécute blockAllClients toutes les 1000 millisecondes (1 seconde)
 setInterval(async () => {
