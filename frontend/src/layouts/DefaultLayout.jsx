@@ -23,13 +23,13 @@ export default function DefaultLayout() {
   };
 
   return (
-    <div className="h-screen overfow-y-hidden flex w-full bg-gray-100 dark:bg-gray-900">
+    <div className="h-screen overfow-y-hidden flex w-full bg-[#e4edf4] dark:bg-[#121212]">
       <Sidebar className="relative">
         <SidebarLogo
-          titleClassName="font-bold text-2xl text-white "
-          titleSpanClassName={"text-orange-500"}
-          titlePartOne={"Cyber"}
-          titlePartTwo={" unknown"}
+          titleClassName="font-bold text-2xl dark:text-[#d8d7d7] text-gray-600"
+          titleSpanClassName={"text-[#6298c7]"}
+          titlePartOne={"Cyber "}
+          titlePartTwo={"Diamond"}
         />
         <div className="p-4">
           <SidebarItem title={"Dashboard"} icon={<HiChartPie />} />
@@ -60,13 +60,13 @@ export default function DefaultLayout() {
         </div>
 
         <div className=" flex min-h-[250px] justify-end flex-col p-3 space-y-2 absolute bottom-0">
-          <div className=" dark:bg-gray-700 rounded-lg p-4 py-0">
-            <h2 className=" font-semibold mb-2 text-white">Passerelle</h2>
-            <p className="text-sm text-white">{gatewayInfo.ip}</p>
+          <div className=" dark:text-[#d8d7d7] rounded-lg p-4 py-0">
+            <h2 className=" font-semibold mb-2 text-gray-700 dark:text-[#d8d7d7]">Passerelle</h2>
+            <p className="text-sm text-gray-700 dark:text-[#d8d7d7]">{gatewayInfo.ip}</p>
           </div>
-          <div className=" dark:bg-gray-700 rounded-lg p-4 py-0">
-            <h2 className=" font-semibold mb-2 text-white">Mac du routeur</h2>
-            <p className="text-sm text-white">{gatewayInfo.mac}</p>
+          <div className="dark:text-[#d8d7d7]  rounded-lg p-4 py-0">
+            <h2 className=" font-semibold mb-2 text-gray-700 dark:text-[#d8d7d7]">Mac du routeur</h2>
+            <p className="text-sm text-gray-700 dark:text-[#d8d7d7]">{gatewayInfo.mac}</p>
           </div>
         </div>
       </Sidebar>

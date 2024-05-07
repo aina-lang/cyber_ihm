@@ -1,0 +1,29 @@
+tailwindcss.config
+
+colors: {
+    'text': 'var(--text)',
+    'background': 'var(--background)',
+    'primary': 'var(--primary)',
+    'secondary': 'var(--secondary)',
+    'accent': 'var(--accent)',
+   },
+
+   
+   main.css 
+   @layer base {
+    :root {
+      --text: #07060d;
+      --background: #f5f3fb;
+      --primary: #614bc5;
+      --secondary: #a698e3;
+      --accent: #7f6bde;
+    }
+    .dark {
+      --text: #f2f1f9;
+      --background: #06040b;
+      --primary: #513bb5;
+      --secondary: #2a1d68;
+      --accent: #332092;
+    }
+  },
+  

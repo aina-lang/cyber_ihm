@@ -48,7 +48,7 @@ function AddClientModal({ isOpen, onClose }) {
             exit={{ opacity: 0 }}
           >
             <motion.div
-              className="modal-content bg-white rounded-lg shadow-lg p-6 relative"
+              className="modal-content bg-[#fcfcfc] rounded-lg shadow-lg p-6 relative"
               initial={{ y: "-100vh" }}
               animate={{ y: 0 }}
               exit={{ y: "-100vh" }}
@@ -178,13 +178,13 @@ function AddClientModal({ isOpen, onClose }) {
                  
                       <button
                         type="submit"
-                        className="bg-orange-500 text-white px-4 py-2 rounded-md hover:bg-orange-600 transition-colors duration-200"
+                        className="bg-indigo-500 text-white px-5 py-3 rounded-md  transition-colors duration-200"
                       >
                         Ajouter
                       </button>
                       <button
                         type="submit"
-                        className="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 transition-colors duration-200"
+                        className="bg-gray-200 text-indigo-500 px-5 py-3 rounded-md  transition-colors duration-200"
                       >
                         Ajouter
                       </button>

@@ -7,7 +7,7 @@ import MyNav from "./components/MyNav";
 
 function App() {
   return (
-    <div className="h-screen overfow-y-hidden flex w-full bg-gray-100">
+    <div className="h-screen overfow-y-hidden flex w-full bg-[#f5f5f5]">
       <Sidebar>
         <SidebarLogo
           titleClassName="font-bold text-2xl text-white "

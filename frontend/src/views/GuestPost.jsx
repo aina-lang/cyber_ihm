@@ -238,7 +238,7 @@ const GuestPost = () => {
         <Tooltip content="Ajouter un nouveau client" animation="duration-150">
           <button
             onClick={() => setIsModalOpen(true)}
-            className="bg-orange-500 hover:bg-orange-700  text-white font-bold py-2 px-4 rounded flex items-center mb-3 shadow-md"
+            className="bg-teal-500  text-white font-bold py-2 px-4 rounded flex items-center mb-3 shadow-md"
           >
             <FaPlus className="mr-2" />
             Nouveau poste
@@ -248,7 +248,7 @@ const GuestPost = () => {
           {" "}
           <button
           onClick={handleDeleteAllClients}
-            className="bg-orange-500 hover:bg-orange-700  text-white font-bold py-2 px-4 rounded flex items-center mb-3 shadow-md"
+            className="bg-teal-500  text-white font-bold py-2 px-4 rounded flex items-center mb-3 shadow-md"
           >
             <IoReload />
           </button>
@@ -324,7 +324,7 @@ const GuestPost = () => {
         <Tooltip content="Ajouter un nouveau client" animation="duration-150">
           <button
             onClick={() => setIsModalOpen(true)}
-            className="bg-orange-500 hover:bg-orange-700  text-white font-bold py-2 px-4 rounded flex items-center"
+            className="bg-teal-500  text-white font-bold py-2 px-4 rounded flex items-center"
           >
             <FaPlus className="mr-2" />
             Nouveau poste

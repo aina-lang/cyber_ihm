@@ -7,7 +7,7 @@ function BreadCumb({ title, subtitle, root, rootLink }) {
       aria-label="breadcrumb"
       className="w-full p-5 pl-0 border-b border-gray-300 flex justify-between mb-5"
     >
-      <h2 className="font-semibold text-2xl text-gray-600">
+      <h2 className="font-semibold text-2xl text-[#2c2c2c]  dark:text-[#f8f8f8]">
         {" "}
         {subtitle && <p>{subtitle}</p>}
       </h2>
@@ -15,8 +15,8 @@ function BreadCumb({ title, subtitle, root, rootLink }) {
         <li className="text-gray-600">
           <Link to={rootLink}>{root}</Link>
         </li>{" "}
-        <p>/</p>
-        <li className="text-orange-500" aria-current="page">
+        <p className="dark:text-[#f8f8f8]">/</p>
+        <li className="text-[#2c2c2c]" aria-current="page">
           {title}
         </li>
       </ol>

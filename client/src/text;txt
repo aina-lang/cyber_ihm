@@ -1,0 +1,45 @@
+    <div className="cybercafe-dashboard flex flex-col items-center min-h-screen bg-gray-100">
+      <header className="dashboard-header flex justify-between items-center py-4 px-8 bg-white rounded-lg shadow-md mb-8">
+        <img src={logo} alt="Logo du cybercafé" className="w-20 h-20 mr-4" />
+        <h1 className="text-xl font-bold">Cyber Unknown</h1>
+      </header>
+
+      <section className="client-info grid grid-cols-1 md:grid-cols-2 gap-4 px-8 py-4 bg-white rounded-lg shadow-md">
+        <div className="flex items-center gap-4">
+          <span className="text-gray-700">IP:</span>
+          <span className="font-bold">192.168.70.121</span>
+        </div>
+        <div className="flex items-center gap-4">
+          <span className="text-gray-700">Nom:</span>
+          <span className="font-bold">HP WINDOWS</span>
+        </div>
+        <div className="flex items-center gap-4">
+          <span className="text-gray-700">Heure de début:</span>
+          <span className="font-bold">10:12</span>
+        </div>
+        <div className="flex items-center gap-4">
+          <span className="text-gray-700">Temps écoulé:</span>
+          <span className="font-bold">12:10</span>
+        </div>
+        <div className="flex items-center gap-4">
+          <span className="text-gray-700">Heure de fin:</span>
+          <span className="font-bold">06:45</span>
+        </div>
+        <div className="flex items-center gap-4">
+          <span className="text-gray-700">Temps restant:</span>
+          <span className="font-bold">12:45</span>
+        </div>
+      </section>
+
+      <div className="buttons flex justify-center mt-8">
+        <button id="btn-close" className="btn btn-primary">
+          Fermer
+        </button>
+        <button id="btn-pause" className="btn btn-secondary mx-4">
+          Pause
+        </button>
+        <button id="btn-feedback" className="btn btn-info">
+          Feedback
+        </button>
+      </div>
+    </div>

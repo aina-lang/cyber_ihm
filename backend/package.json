@@ -8,6 +8,10 @@
     "libnmap": "^0.4.19",
     "local-devices": "^4.0.0",
     "mongoose": "^8.3.2",
-    "speedtest-net": "^2.2.0"
+    "open": "^10.1.0",
+    "socket.io": "^4.7.5",
+    "speedtest-net": "^2.2.0",
+    "web-push": "^3.6.7",
+    "ws": "^8.16.0"
   }
 }

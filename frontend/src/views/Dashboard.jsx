@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import BreadCumb from "../components/BreadCumb";
 import Chart from "react-apexcharts";
+import { FaUserFriends, FaUser, FaUserPlus } from "react-icons/fa";
 
 function Dashboard() {
   const [wifiBandwidth, setWifiBandwidth] = useState([]);
@@ -67,6 +68,7 @@ function Dashboard() {
     xaxis: {
       categories: Array.from({ length: 24 }, (_, i) => `${i}:00`),
     },
+    colors: ["#6875f5"],
   };
 
   const dailyChartOptions = {
@@ -76,8 +78,13 @@ function Dashboard() {
     xaxis: {
       categories: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
     },
+    colors: ["#6875f5"],
+    plotOptions: {
+      pie: {
+        size: "70%",
+      },
+    },
   };
-
   const weeklyChartOptions = {
     chart: {
       id: "weekly-connections-chart",
@@ -85,6 +92,7 @@ function Dashboard() {
     xaxis: {
       categories: ["Week 1", "Week 2", "Week 3", "Week 4"],
     },
+    colors: ["#6875f5"],
   };
 
   const sessionDurationChartOptions = {
@@ -94,82 +102,60 @@ function Dashboard() {
     xaxis: {
       categories: Array.from({ length: 24 }, (_, i) => `${i}:00`),
     },
+    colors: ["#6875f5"],
   };
 
   return (
     <div>
       <BreadCumb subtitle={"Dashboard"} root={"Dashboard"} title={""} />
-      <div className="flex justify-between space-x-4  text-gray-700">
-        <div className="w-1/4 bg-white rounded-lg p-4 shadow-md text-gray-800">
-          <div className="text-xl font-semibold mb-2 text-gray-800">
-            Postes connectés
+      <div className="grid grid-cols-2 gap-8">
+        <div className="space-y-4">
+          <div className="flex justify-between space-x-4  text-xl dark:text-[#d8d7d7]">
+            <div className="w-1/3  dark: dark:border-none border  bg-[#fcfcfc]  rounded-lg p-4 text-gray-700">
+              <div className="text-xl dark:text-[#d8d7d7] font-semibold mb-2 text-gray-700 flex items-center">
+                <FaUserFriends className="mr-2" /> Actives
+              </div>
+              <p className="text-3xl font-bold dark:text-[#d8d7d7]">
+                {totalConnections}
+              </p>
+            </div>
+            <div className="w-1/3  dark: rounded-lg p-4 border bg-[#fcfcfc]   text-gray-700">
+              <div className="text-xl dark:text-[#d8d7d7] font-semibold mb-2 text-gray-700 flex items-center">
+                <FaUser className="mr-2" /> locaux
+              </div>
+              <p className="text-3xl font-bold dark:text-[#d8d7d7]">
+                {localPostsUsed}/12
+              </p>
+            </div>
+            <div className="w-1/3  dark: rounded-lg p-4 border bg-[#fcfcfc]   text-gray-700">
+              <div className="text-xl dark:text-[#d8d7d7] font-semibold mb-2 text-gray-700 flex items-center">
+                <FaUserPlus className="mr-2" /> invités
+              </div>
+              <p className="text-3xl font-bold dark:text-[#d8d7d7]">
+                {guestPosts}
+              </p>
+            </div>
           </div>
-          <p className="text-3xl font-bold text-gray-700">{totalConnections}</p>
-        </div>
-        <div className="w-1/4 bg-white rounded-lg p-4 shadow-md text-gray-800">
-          <div className="text-xl font-semibold mb-2 text-gray-800">
-            Postes locaux utilisés
+          <div className="bg-[#fcfcfc] h-auto  dark:border-none dark:bg-[#1d1d1d] border  rounded-lg p-4 border-gray-200">
+            <h2 className="text-xl dark:text-[#d8d7d7] font-semibold mb-4">
+              Nombre de connexions par heure
+            </h2>
+            <Chart
+              options={hourlyChartOptions}
+              series={[{ name: "Connexions", data: hourlyConnections }]}
+              type="bar"
+              width="100%"
+            />
           </div>
-          <p className="text-3xl font-bold text-gray-700">
-            {localPostsUsed}/12
-          </p>
         </div>
-        <div className="w-1/4 bg-white rounded-lg p-4 shadow-md text-gray-800">
-          <div className="text-xl font-semibold mb-2 text-gray-800">
-            Postes invités
-          </div>
-          <p className="text-3xl font-bold text-gray-700">{guestPosts}</p>
-        </div>
-        <div className="w-1/4 bg-white rounded-lg p-4 shadow-md text-gray-800">
-          <div className="text-xl font-semibold mb-2 text-gray-800">
-            Connexions sur WiFi
-          </div>
-          <p className="text-3xl font-bold text-gray-700">100</p>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-2 gap-4 my-4">
-        <div className="bg-white rounded-lg p-4 shadow-lg">
-          <h2 className="text-xl font-semibold mb-4">
-            Nombre de connexions par heure
-          </h2>
-          <Chart
-            options={hourlyChartOptions}
-            series={[{ name: "Connexions", data: hourlyConnections }]}
-            type="bar"
-            width="100%"
-          />
-        </div>
-        <div className="bg-white rounded-lg p-4 shadow-lg">
-          <h2 className="text-xl font-semibold mb-4">
+        <div className="bg-[#fcfcfc]  dark:border-none  dark:bg-[#1d1d1d] border rounded-lg p-4 border-gray-200">
+          <h2 className="text-xl dark:text-[#d8d7d7] font-semibold mb-4">
             Nombre de connexions par jour
           </h2>
           <Chart
             options={dailyChartOptions}
             series={[{ name: "Connexions", data: dailyConnections }]}
-            type="bar"
-            width="100%"
-          />
-        </div>
-        <div className="bg-white rounded-lg p-4 shadow-lg">
-          <h2 className="text-xl font-semibold mb-4">
-            Nombre de connexions par semaine
-          </h2>
-          <Chart
-            options={weeklyChartOptions}
-            series={[{ name: "Connexions", data: weeklyConnections }]}
-            type="bar"
-            width="100%"
-          />
-        </div>
-        <div className="bg-white rounded-lg p-4 shadow-lg">
-          <h2 className="text-xl font-semibold mb-4">
-            Durée moyenne des sessions (en minutes)
-          </h2>
-          <Chart
-            options={sessionDurationChartOptions}
-            series={[{ name: "Durée moyenne", data: averageSessionDuration }]}
-            type="line"
+            type="heatmap"
             width="100%"
           />
         </div>

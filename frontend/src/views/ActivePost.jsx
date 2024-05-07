@@ -280,7 +280,7 @@ const ActivePost = () => {
         <Tooltip content="Ajouter un nouveau client" animation="duration-150">
           <button
             onClick={() => setIsModalOpen(true)}
-            className="bg-orange-500 hover:bg-orange-700  text-white font-bold py-2 px-4 rounded flex items-center mb-3 shadow-md"
+            className=" bg-[#6298c7] text-white font-bold py-2 px-4 rounded flex items-center mb-3 shadow-md"
           >
             <FaPlus className="mr-2" />
             Nouveau poste
@@ -290,7 +290,7 @@ const ActivePost = () => {
           {" "}
           <button
             onClick={handleRefreshAllClients}
-            className="bg-orange-500 hover:bg-orange-700  text-white font-bold py-2 px-4 rounded flex items-center mb-3 shadow-md"
+            className="bg-[#6298c7]  text-white font-bold py-2 px-4 rounded flex items-center mb-3 shadow-md"
           >
             <IoReload />
           </button>
