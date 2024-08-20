@@ -16,20 +16,20 @@ const SidebarGroupItem = ({ title, icon, children }) => {
     <div>
       <button
         className={` rounded my-1 flex items-center justify-between w-full hover:bg-[#d9ebed]/50 transition-all ${
-          iscollapsed ? " text-indigo-500" : ""
+          iscollapsed ? " text-[#4183bb]" : ""
         }`}
         onClick={handleClick}
       >
         <div
           className={`text-[22px] h-[45px] min-w-[45px] rounded flex justify-center items-center ${
-            iscollapsed ? "text-indigo-500" : "text-[#505252]"
+            iscollapsed ? "text-[#4183bb]" : "text-[#505252]"
           }`}
         >
           {icon}
         </div>
         <p
           className={` ml-3 ${
-            iscollapsed ? "text-indigo-500" : "text-[#505252]"
+            iscollapsed ? "text-[#4183bb]" : "text-[#505252]"
           }  ${collapsed ? "" : "w-0 hidden"}`}
         >
           {title}
@@ -37,7 +37,7 @@ const SidebarGroupItem = ({ title, icon, children }) => {
         {collapsed && (
           <div className="ml-auto">
             {iscollapsed ? (
-              <HiChevronUp className="text-[#6298c7]text-lg" />
+              <HiChevronUp className="text-[#4183bb]text-lg" />
             ) : (
               <HiChevronDown className="text-[#505252] text-lg" />
             )}

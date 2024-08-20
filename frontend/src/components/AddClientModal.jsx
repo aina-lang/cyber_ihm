@@ -1,10 +1,17 @@
-import React from "react";
+import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Formik, Form, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { AiOutlineClose } from "react-icons/ai";
 
 function AddClientModal({ isOpen, onClose }) {
+  const [octet1, setOctet1] = useState("");
+  const [octet2, setOctet2] = useState("");
+  const [octet3, setOctet3] = useState("");
+  const [octet4, setOctet4] = useState("");
+  const [macAddress, setMacAddress] = useState(""); 
+  const [name, setName] = useState("");
+
   const initialValues = {
     octet1: "",
     octet2: "",
@@ -14,27 +21,65 @@ function AddClientModal({ isOpen, onClose }) {
     name: "",
   };
 
-  const validationSchema = Yup.object({
-    octet1: Yup.string()
-      .required("Le premier octet est requis")
-      .matches(/^\d{1,3}$/, "Veuillez entrer un octet valide"),
-    octet2: Yup.string()
-      .required("Le deuxième octet est requis")
-      .matches(/^\d{1,3}$/, "Veuillez entrer un octet valide"),
-    octet3: Yup.string()
-      .required("Le troisième octet est requis")
-      .matches(/^\d{1,3}$/, "Veuillez entrer un octet valide"),
-    octet4: Yup.string()
-      .required("Le quatrième octet est requis")
-      .matches(/^\d{1,3}$/, "Veuillez entrer un octet valide"),
-    macAddress: Yup.string().required("L'adresse MAC est requise"),
-    name: Yup.string().required("Le nom du client est requis"),
-  });
+  const handleChange = (e, setter, nextInput) => {
+    const { value } = e.target;
+    // Vérifier si le champ contient déjà 3 chiffres
+    if (value.length <= 3) {
+      // Vérifier si la valeur est supérieure à 255 ou si le champ est vide (pour permettre la suppression)
+      if (parseInt(value) <= 255 || value === "") {
+        setter(value);
+        // Focus sur le prochain champ d'entrée si la longueur est de 3 chiffres
+        if (value.length === 3 && nextInput) {
+          nextInput.focus();
+        }
+      }
+    }
+  };
+
+  const handleBlur = (e, setter) => {
+    const { value } = e.target;
+    if (parseInt(value) > 255) {
+      setter(255);
+    }
+  };
 
   const handleSubmit = (values, { resetForm }) => {
     console.log("Nouveau client :", values);
     resetForm();
     onClose();
+  };
+
+  const validationSchema = Yup.object({
+    octet1: Yup.number()
+      .required("Le premier octet est requis")
+      .integer("Veuillez entrer un nombre entier")
+      .min(0, "La valeur minimale est 0")
+      .max(255, "La valeur maximale est 255"),
+    octet2: Yup.number()
+      .required("Le deuxième octet est requis")
+      .integer("Veuillez entrer un nombre entier")
+      .min(0, "La valeur minimale est 0")
+      .max(255, "La valeur maximale est 255"),
+    octet3: Yup.number()
+      .required("Le troisième octet est requis")
+      .integer("Veuillez entrer un nombre entier")
+      .min(0, "La valeur minimale est 0")
+      .max(255, "La valeur maximale est 255"),
+    octet4: Yup.number()
+      .required("Le quatrième octet est requis")
+      .integer("Veuillez entrer un nombre entier")
+      .min(0, "La valeur minimale est 0")
+      .max(255, "La valeur maximale est 255"),
+    macAddress: Yup.string().required("L'adresse MAC est requise"),
+    name: Yup.string().required("Le nom du client est requis"),
+  });
+  const resetForm = () => {
+    setOctet1("");
+    setOctet2("");
+    setOctet3("");
+    setOctet4("");
+    setMacAddress("");
+    setName("");
   };
 
   return (
@@ -55,7 +100,10 @@ function AddClientModal({ isOpen, onClose }) {
             >
               <button
                 className="close-button absolute top-0 right-0 mt-2 mr-2 p-3 text-gray-600 hover:text-gray-800"
-                onClick={onClose}
+                onClick={() => {
+                  onClose();
+                  resetForm();
+                }}
               >
                 <AiOutlineClose />
               </button>
@@ -67,7 +115,7 @@ function AddClientModal({ isOpen, onClose }) {
                 validationSchema={validationSchema}
                 onSubmit={handleSubmit}
               >
-                {({ errors, touched, values, handleChange, handleBlur }) => (
+                {({ errors, touched, values }) => (
                   <Form className="space-y-4">
                     <div>
                       <label
@@ -81,9 +129,14 @@ function AddClientModal({ isOpen, onClose }) {
                           type="text"
                           id="octet1"
                           name="octet1"
-                          value={values.octet1}
-                          onChange={handleChange}
-                          onBlur={handleBlur}
+                          value={octet1}
+                          onChange={(e) =>
+                            handleChange(
+                              e,
+                              setOctet1,
+                              document.getElementById("octet2")
+                            )
+                          }
                           className="border-0 w-[70px] text-center bg-transparent   rounded-md px-3 py-2 mr-1 focus:outline-none "
                           placeholder="192"
                         />
@@ -92,9 +145,14 @@ function AddClientModal({ isOpen, onClose }) {
                           type="text"
                           id="octet2"
                           name="octet2"
-                          value={values.octet2}
-                          onChange={handleChange}
-                          onBlur={handleBlur}
+                          value={octet2}
+                          onChange={(e) =>
+                            handleChange(
+                              e,
+                              setOctet2,
+                              document.getElementById("octet3")
+                            )
+                          }
                           className="border-0 w-[70px] text-center bg-transparent  rounded-md px-3 py-2 mr-1 focus:outline-none "
                           placeholder="168"
                         />
@@ -103,9 +161,14 @@ function AddClientModal({ isOpen, onClose }) {
                           type="text"
                           id="octet3"
                           name="octet3"
-                          value={values.octet3}
-                          onChange={handleChange}
-                          onBlur={handleBlur}
+                          value={octet3}
+                          onChange={(e) =>
+                            handleChange(
+                              e,
+                              setOctet3,
+                              document.getElementById("octet4")
+                            )
+                          }
                           className="border-0 w-[70px] text-center bg-transparent  rounded-md px-3 py-2 mr-1 focus:outline-none "
                           placeholder="70"
                         />
@@ -114,9 +177,8 @@ function AddClientModal({ isOpen, onClose }) {
                           type="text"
                           id="octet4"
                           name="octet4"
-                          value={values.octet4}
-                          onChange={handleChange}
-                          onBlur={handleBlur}
+                          value={octet4}
+                          onChange={(e) => handleChange(e, setOctet4)}
                           className="border-0 w-[70px] text-center bg-transparent  rounded-md px-3 py-2 mr-1 focus:outline-none "
                           placeholder="1"
                         />
@@ -175,16 +237,15 @@ function AddClientModal({ isOpen, onClose }) {
                       )}
                     </div>
                     <div className="flex space-x-4">
-                 
                       <button
                         type="submit"
-                        className="bg-indigo-500 text-white px-5 py-3 rounded-md  transition-colors duration-200"
+                        className="bg-[#6298c7] text-white px-5 py-3 rounded-md  transition-colors duration-200"
                       >
                         Ajouter
                       </button>
                       <button
                         type="submit"
-                        className="bg-gray-200 text-indigo-500 px-5 py-3 rounded-md  transition-colors duration-200"
+                        className="bg-gray-200 text-[#6298c7] px-5 py-3 rounded-md  transition-colors duration-200"
                       >
                         Ajouter
                       </button>

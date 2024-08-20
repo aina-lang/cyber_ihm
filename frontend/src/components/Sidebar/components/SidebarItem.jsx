@@ -15,13 +15,13 @@ const SidebarItem = ({ title, icon, to }) => {
     <Link
       to={to}
       className={`rounded my-1 flex items-center min-w-[40px] overflow-hidden space-x-3 w-full transition-all ${
-        isActive ? "bg-[#6298c7]" : " hover:bg-[#d9ebed]"
+        isActive ? "bg-[#4183bb] shadow-md" : " hover:bg-[#d9ebed]"
       }`}
       onClick={handleClick}
     >
       <div
         className={`text-[22px] h-[45px] min-w-[45px] rounded flex justify-center items-center  ${
-          isActive ? "text-white bg-[#6298c7]" : "text-[#505252]"
+          isActive ? "text-white bg-[#4183bb]" : "text-[#373838]"
         }`}
       >
         {icon}

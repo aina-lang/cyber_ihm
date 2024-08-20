@@ -44,14 +44,14 @@ export default function MyNavBar() {
   return (
     <Navbar
       fluid
-      className="w-full  h-[72px] py-4 items-center absolute z-40 dark:bg-[#1d1d1d] bg-white shadow-sm "
+      className="w-[98%] rounded-md mx-2 top-2 h-[72px] py-4 items-center absolute z-40 dark:bg-[#1d1d1d] bg-white shadow-sm "
     >
-      <Navbar.Brand href="https://flowbite-react.com" className="space-x-5">
+      <Navbar.Brand href="https://flowbite-react.com" className="space-x-5 cursor-default">
      
         <div className="flex items-center ">
           <FiWifi className="mr-2 dark:text-[#d8d7d7]" />
           <span className="self-center whitespace-nowrap text-sm dark:text-[#d8d7d7]">
-            {wifiSpeed} Mbits/s <span className="text-indigo-500"> (WiFi)</span> 
+            {wifiSpeed} Mbits/s <span className="text-[#4183bb]"> (WiFi)</span> 
           </span>
         </div>
         {/* <div className="flex items-center">
@@ -74,7 +74,7 @@ export default function MyNavBar() {
           onChange={handleChange}
         />
         <Dropdown
-        className="shadow-none mr-3"
+        className="shadow-md border-none mr-3"
           arrowIcon={false}
           inline
           label={

@@ -27,7 +27,7 @@ export default function DefaultLayout() {
       <Sidebar className="relative">
         <SidebarLogo
           titleClassName="font-bold text-2xl dark:text-[#d8d7d7] text-gray-600"
-          titleSpanClassName={"text-[#6298c7]"}
+          titleSpanClassName={"text-[#4183bb]"}
           titlePartOne={"Cyber "}
           titlePartTwo={"Diamond"}
         />
@@ -35,11 +35,7 @@ export default function DefaultLayout() {
           <SidebarItem title={"Dashboard"} icon={<HiChartPie />} />
 
           <SidebarGroupItem title="Postes" icon={<HiUsers />}>
-            {/* <SidebarItem
-              to={"/wifi"}
-              title="Postes locaux"
-              icon={<HiWifi />}
-            /> */}
+           
             <SidebarItem
               to={"/active"}
               title="Postes actifs"
