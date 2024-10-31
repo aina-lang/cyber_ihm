@@ -4,7 +4,7 @@ const cors = require("cors");
 const socketIo = require("socket.io");
 const http = require("http");
 const Client = require("./models/Client");
-const webpush= require("web-push");
+
 const clientRouter=require('./routes/ClientRoutes')
 const app = express();
 app.use(cors());
@@ -13,16 +13,6 @@ app.use(express.json());
 
 app.use("/api", clientRouter);
 
-const vapidKeys = {
-  publicKey: "BLuQ_pKHORVpPPMSup1LYuc4RJm0t1car6O4p_m5GiOmEsZso_QBwWc-CF_JDaFEJVD--U9u543N_hR0IV9p32Y",
-  privateKey:"TFlHoFSBCrU7lxoEkjfo8FtyBCNhFAJFAY-v_097A7k",
-};
-
-// webpush.setVapidDetails(
-//   "merciaaina@gmail.com",
-//   vapidKeys.publicKey,
-//   vapidKeys.privateKey
-// )
 
 mongoose.connect("mongodb://127.0.0.1:27017/ihm");
 

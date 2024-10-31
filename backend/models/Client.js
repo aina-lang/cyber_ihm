@@ -18,7 +18,7 @@ const clientSchema = new mongoose.Schema({
   },
   isLocal: {
     type: Boolean,
-    default: true, 
+    default: true,
   },
   startTime: {
     type: Date,
@@ -26,9 +26,10 @@ const clientSchema = new mongoose.Schema({
   endTime: {
     type: Date,
   },
+  spentCost: { type: Number, default: 0 },
   elapsedTime: {
-    type: String, 
-    default: 0, 
+    type: String,
+    default: 0,
   },
   isRunning: {
     type: Boolean,

@@ -22,6 +22,7 @@ const ActivePost = () => {
   const [rowData, setRowData] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedRows, setSelectedRows] = useState([]);
+  const [elapsedTimes, setElapsedTimes] = useState({});
 
   const handleSelectionChanged = (event) => {
     const selectedNodes = event.api.getSelectedNodes();
@@ -30,19 +31,144 @@ const ActivePost = () => {
   };
 
   useEffect(() => {
-    const fetchClientsData = async () => {
-      try {
-        const response = await axios.get("http://localhost:8000/api/clients/");
-        console.log(response);
-        setRowData(response.data);
-      } catch (error) {
-        console.error(
-          "Erreur lors de la récupération des données des clients :",
-          error
-        );
-      }
-    };
+    const interval = setInterval(() => {
+      setElapsedTimes((prev) => {
+        const updatedTimes = rowData.reduce((acc, client) => {
+          if (client.isRunning && client.startTime) {
+            const now = new Date();
+            const elapsedMilliseconds = now - new Date(client.startTime);
 
+            // Calculer le temps écoulé au format HH:MM:SS
+            const elapsed = new Date(elapsedMilliseconds)
+              .toISOString()
+              .substr(11, 8); // Format HH:MM:SS
+
+            // Calculer le coût (20 euros par minute, ajustez selon vos besoins)
+            const totalMinutes = Math.floor(elapsedMilliseconds / (1000 * 60));
+            const cost = totalMinutes * 20; // Exemple de coût de 20 euros par minute
+
+            acc[client._id] = {
+              elapsed,
+              cost, // Ajoutez le coût ici
+            };
+          }
+          return acc;
+        }, {});
+
+        return updatedTimes;
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [rowData]);
+
+  const handleStopSession = async () => {
+    try {
+      // Envoyer une requête au backend pour bloquer les connexions des clients sélectionnés
+      const response = await axios.put(
+        "http://localhost:8000/api/clients/block",
+        {
+          selectedClientIps: selectedRows.map((client) => client.ipAddress),
+        }
+      );
+
+      // Envoyer une requête au backend pour stopper les sessions des clients sélectionnés
+      await Promise.all(
+        selectedRows.map((client) =>
+          axios.put(
+            `http://localhost:8000/api/clients/${client._id}/session/stop`
+          )
+        )
+      );
+      // selectedRows.map((client) =>{console.log(client)} );
+      // Mettre à jour l'état des clients dans la grille
+
+      fetchClientsData();
+
+      // setRowData(updatedRowData);
+
+      // Afficher une notification de succès
+      MySwal.fire({
+        icon: "success",
+        title: "Sessions arrêtées et connexions bloquées avec succès",
+      });
+    } catch (error) {
+      console.error(
+        "Erreur lors de l'arrêt des sessions et du blocage des connexions :",
+        error
+      );
+      // Afficher une notification d'erreur
+      MySwal.fire({
+        icon: "error",
+        title:
+          "Erreur lors de l'arrêt des sessions et du blocage des connexions",
+        text: "Veuillez réessayer plus tard.",
+      });
+    }
+  };
+
+  // Fonction pour démarrer une session
+  const handleStartSession = async () => {
+    try {
+      await Promise.all(
+        selectedRows.map((client) =>
+          axios.put(
+            `http://localhost:8000/api/clients/${client._id}/session/start`
+          )
+        )
+      );
+
+      console.log("Sessions démarrées avec succès");
+
+      // Mettre à jour l'état local si nécessaire pour refléter le changement
+
+      fetchClientsData();
+
+      // setRowData(updatedRowData);
+
+      // Afficher une notification de succès
+      MySwal.fire({
+        icon: "success",
+        title: "Sessions démarrées avec succès",
+      });
+    } catch (error) {
+      console.error("Erreur lors du démarrage des sessions :", error);
+
+      // Afficher une notification d'erreur
+      MySwal.fire({
+        icon: "error",
+        title: "Erreur lors du démarrage des sessions",
+        text: "Veuillez réessayer plus tard.",
+      });
+    }
+  };
+
+  const handleEditSession = () => {
+    // Gérer l'édition de la session WiFi
+  };
+
+  const handleRefreshSession = () => {
+    // Gérer la suppression de la session WiFi
+  };
+
+  const handleViewSession = () => {
+    // Gérer la visualisation de la session WiFi
+  };
+
+  const fetchClientsData = async () => {
+    try {
+      const response = await axios.get("http://localhost:8000/api/clients/");
+      console.log(response);
+      setRowData(response.data);
+    } catch (error) {
+      console.error(
+        "Erreur lors de la récupération des données des clients :",
+        error
+      );
+    }
+  };
+
+  useEffect(() => {
     fetchClientsData();
   }, []);
 
@@ -78,6 +204,8 @@ const ActivePost = () => {
     }
   };
 
+  const hourlyRate = 20; // Tarif horaire en euros
+
   const columnDefs = [
     {
       headerName: "Nom de l'appareil",
@@ -88,204 +216,89 @@ const ActivePost = () => {
     },
     { headerName: "Adresse IP", field: "ipAddress" },
     { headerName: "Adresse MAC", field: "macAddress" },
-
     {
-      headerName: "Etat",
+      headerName: "Statut",
       field: "isRunning",
-      // resizable: false,
-      width: 100,
       cellRenderer: (params) => (
         <div className="flex items-center justify-center">
           {params.value ? (
-            <span className="text-green-500">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M5 13l4 4L19 7"
-                />
-              </svg>
-            </span>
+            <span className="text-blue-500">En cours</span>
           ) : (
-            <span className="text-red-500">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </span>
+            <span className="text-red-500">Arrêté</span>
           )}
         </div>
       ),
     },
     {
-      headerName: "Bloqué",
-      field: "isBlocked",
-      // resizable: false,
-      width: 120,
-      cellRenderer: (params) => (
-        <div className="flex items-center justify-center">
-          {params.value ? (
-            <span className="text-red-500">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </span>
-          ) : (
-            <span className="text-green-500">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M5 13l4 4L19 7"
-                />
-              </svg>
-            </span>
-          )}
-        </div>
-      ),
+      headerName: "Heure de début",
+      field: "startTime",
+      valueFormatter: (params) =>
+        params.value ? new Date(params.value).toLocaleString("fr-FR") : "N/A",
     },
-
     {
-      headerName: "Actions",
-      field: "id",
-      cellRenderer: (params) => (
-        <div className="flex items-center justify-around h-full text-gray-600">
-          <button className=" p-3 rounded flex items-center justify-center ">
-            <FaEdit onClick={() => handleEditSession()} className="" />
-          </button>
-          <button
-            onClick={() => handleRefreshSession()}
-            className="p-3 rounded flex items-center justify-center "
-          >
-            <FaTrashAlt className="" />
-          </button>
-          <button
-            onClick={() => handleViewSession()}
-            className=" p-3 rounded flex items-center justify-center"
-          >
-            <FaEye className="" />
-          </button>
-        </div>
-      ),
+      headerName: "Heure de fin",
+      field: "endTime",
+      valueFormatter: (params) =>
+        params.value ? new Date(params.value).toLocaleString("fr-FR") : "N/A",
+    },
+    {
+      headerName: "Temps écoulé",
+      field: "elapsedTime",
+      valueGetter: (params) => {
+        // console.log(elapsedTimes[params.data._id]);
+        // Afficher en temps réel pour les clients en cours de session
+        return params.data.isRunning && elapsedTimes[params.data._id]
+          ? elapsedTimes[params.data._id].elapsed || "00:00:00" // Accéder directement à elapsedTimes pour le client actif
+          : params.data.elapsedTime || "00:00:00"; // Utiliser elapsedTime pour les clients non actifs
+      },
+    },
+    {
+      headerName: "Coût total",
+      field: "spentCost",
+      valueGetter: (params) => {
+        if (params.data.isRunning && elapsedTimes[params.data._id]) {
+          const elapsed = elapsedTimes[params.data._id];
+          // console.log(elapsed);
+          return `${elapsed.cost} Ar`;
+        }
+        return "0 Ar";
+      },
     },
   ];
+
+  const updateCost = (data) => {
+    console.log("Données pour mettre à jour le coût :", data);
+
+    const newCost = calculateNewCost(data.elapsedTime);
+  };
+
+  // Exemple de fonction de calcul de coût
+  const calculateNewCost = (elapsedTime) => {
+    const timeParts = elapsedTime.split(":");
+    const hours = parseInt(timeParts[0]) || 0;
+    const minutes = parseInt(timeParts[1]) || 0;
+    const totalMinutes = hours * 60 + minutes;
+
+    return (totalMinutes / 60) * hourlyRate;
+  };
 
   const defaultColDef = {
     filter: "agTextColumnFilter",
     floatingFilter: true,
   };
 
-  const handlePauseSession = () => {
-    // Gérer la pause de la session WiFi
-  };
-
-  const handleStopSession = async () => {
-    try {
-      // Envoyer une requête au backend pour bloquer les clients sélectionnés
-      const response = await axios.put(
-        "http://localhost:8000/api/clients/block",
-        {
-          selectedClientIps: selectedRows.map((client) => client.ipAddress),
-        }
-      );
-
-      // Mettre à jour l'état des clients sélectionnés dans la grille
-      const updatedRowData = rowData.map((client) => {
-        if (
-          selectedRows.some(
-            (selectedClient) => selectedClient.ipAddress === client.ipAddress
-          )
-        ) {
-          return { ...client, isBlocked: true };
-        }
-        return client;
-      });
-      setRowData(updatedRowData);
-
-      // Afficher une notification de succès
-      MySwal.fire({
-        icon: "success",
-        title: response.data.message,
-      });
-    } catch (error) {
-      console.error("Erreur lors du blocage des connexions :", error);
-      // Afficher une notification d'erreur
-      MySwal.fire({
-        icon: "error",
-        title: "Erreur lors du blocage des connexions",
-        text: "Veuillez réessayer plus tard.",
-      });
-    }
-  };
-
-  const handleEditSession = () => {
-    // Gérer l'édition de la session WiFi
-  };
-
-  const handleRefreshSession = () => {
-    // Gérer la suppression de la session WiFi
-  };
-
-  const handleViewSession = () => {
-    // Gérer la visualisation de la session WiFi
-  };
-
   return (
     <div className="ag-theme-quartz" style={{ height: 300 }}>
       <BreadCumb
-        title={"actifs"}
-        root={"Dashboard"}
-        subtitle={"Postes actifs"}
+        title={"Postes "}
+        root={"Tableau de bord"}
+        subtitle={"Postes "}
       />
       <AddClientModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
       />
       <div className="w-full flex justify-between">
-        <Tooltip content="Ajouter un nouveau client" animation="duration-150">
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className=" bg-[#4183bb] text-white font-bold py-2 px-4 rounded flex items-center mb-3 shadow-md"
-          >
-            <FaPlus className="mr-2" />
-            Nouveau poste
-          </button>
-        </Tooltip>
         <Tooltip content="Actualiser la table" animation="duration-150">
           {" "}
           <button
@@ -315,6 +328,7 @@ const ActivePost = () => {
           animation="duration-150"
         >
           <button
+            onClick={handleStartSession}
             disabled={!selectedRows.length}
             className={`bg-${
               selectedRows.length ? "blue" : "gray"
@@ -322,8 +336,8 @@ const ActivePost = () => {
               selectedRows.length ? "blue" : ""
             }-700 text-white font-bold py-2 px-4 rounded flex items-center`}
           >
-            <FaPause className="mr-2" />
-            Pause
+            {/* < className="mr-2" /> */}
+            Demarrer
           </button>
         </Tooltip>
         <Tooltip
@@ -344,7 +358,7 @@ const ActivePost = () => {
             Stop
           </button>
         </Tooltip>
-        <Tooltip
+        {/* <Tooltip
           aria-disabled={!selectedRows.length}
           content="Générer une facture PDF"
           animation="duration-150"
@@ -360,20 +374,8 @@ const ActivePost = () => {
             <FaMoneyBillWave className="mr-2" />
             Facturer
           </button>
-        </Tooltip>
+        </Tooltip> */}
       </div>
-
-      {/* <div className="absolute right-5 bottom-5">
-        <Tooltip content="Ajouter un nouveau client" animation="duration-150">
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="bg-orange-500 hover:bg-orange-700  text-white font-bold py-2 px-4 rounded flex items-center"
-          >
-            <FaPlus className="mr-2" />
-            Nouveau poste
-          </button>
-        </Tooltip>
-      </div> */}
     </div>
   );
 };

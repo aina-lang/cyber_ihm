@@ -7,7 +7,7 @@ function BreadCumb({ title, subtitle, root, rootLink }) {
       aria-label="breadcrumb"
       className="w-full p-5 pl-0 border-b border-gray-300 flex justify-between mb-5"
     >
-      <h2 className="font-semibold text-2xl text-[#2c2c2c]  dark:text-[#f8f8f8]">
+      <h2 className="font-semibold text-2xl text-[#2c2c2c] dark:text-[#d8d7d7]">
         {" "}
         {subtitle && <p>{subtitle}</p>}
       </h2>

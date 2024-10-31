@@ -7,10 +7,12 @@ const { getNettworkInfo } = require("../services/network");
 const BlockStatus = require("../models/BlockStatus");
 let gatewayIP;
 const { exec } = require("child_process");
+const { saveNetworkInfo } = require("./NetworkInfoController");
 
 async function reloadGateway() {
   try {
     gatewayIP = await getNettworkInfo();
+    // await saveNetworkInfo();
     console.log(gatewayIP);
   } catch (error) {
     console.error(
@@ -25,6 +27,7 @@ reloadGateway();
 exports.getAllClients = async (req, res) => {
   try {
     const clients = await Client.find({});
+    // console.log(clients);
     res.json(clients);
   } catch (error) {
     console.error("Erreur lors de la récupération des clients :", error);
@@ -52,7 +55,7 @@ exports.refreshClients = async (req, res) => {
       ipAddress: device.ip,
       macAddress: device.mac,
       name: device.vendor,
-      isRunning: true,
+      isRunning: false,
       isBlocked: false,
     }));
 
@@ -67,26 +70,26 @@ exports.refreshClients = async (req, res) => {
   }
 };
 
+
 const blockAllClients = async () => {
   try {
-    // Récupérer l'adresse IP de la passerelle
+    // Récupérer tous les clients avec isBlocked true et isRunning false
+    const clientsToBlock = await Client.find({
+      isBlocked: true,
+      isRunning: false,
+    });
 
-    // Mettre à jour l'état de blocage de tous les clients
+    // Mettre à jour l'état de blocage de ces clients
     await Client.updateMany(
-      { ipAddress: { $ne: gatewayIP } },
+      { _id: { $in: clientsToBlock.map(client => client._id) } },
       { $set: { isBlocked: true } }
     );
 
-    // Récupérer tous les clients bloqués
-    const blockedClients = await Client.find({
-      isBlocked: true,
-      ipAddress: { $ne: gatewayIP },
-    });
-
     // Liste des promesses d'attaques pour chaque client bloqué
-    const attackPromises = blockedClients.map(async (client) => {
+    const attackPromises = clientsToBlock.map(async (client) => {
       try {
         await arp.poison(client.ipAddress, gatewayIP);
+        console.log(`Attaque lancée pour l'IP ${client.ipAddress}`);
       } catch (error) {
         console.error("Erreur lors du blocage de l'adresse IP :", error);
       }
@@ -94,23 +97,64 @@ const blockAllClients = async () => {
 
     await Promise.all(attackPromises);
 
-    // console.log(
-    //   "Tous les clients ont été bloqués avec succès et une attaque a été lancée"
-    // );
+    console.log(
+      "Tous les clients bloqués avec isRunning false ont été traités."
+    );
   } catch (error) {
     console.error(
-      "Erreur lors du blocage de tous les clients et de lancement de l'attaque :",
+      "Erreur lors du blocage des clients :",
       error
     );
   }
 };
 
+
+// const blockAllClients = async () => {
+//   try {
+//     // Récupérer l'adresse IP de la passerelle
+
+//     // Mettre à jour l'état de blocage de tous les clients
+//     await Client.updateMany(
+//       { ipAddress: { $ne: gatewayIP } },
+//       { $set: { isBlocked: true } }
+//     );
+
+//     // Récupérer tous les clients bloqués
+//     const blockedClients = await Client.find({
+//       isBlocked: true,
+//       ipAddress: { $ne: gatewayIP },
+//     });
+
+//     // Liste des promesses d'attaques pour chaque client bloqué
+//     const attackPromises = blockedClients.map(async (client) => {
+//       try {
+//         await arp.poison(client.ipAddress, gatewayIP);
+//       } catch (error) {
+//         console.error("Erreur lors du blocage de l'adresse IP :", error);
+//       }
+//     });
+
+//     await Promise.all(attackPromises);
+
+//     // console.log(
+//     //   "Tous les clients ont été bloqués avec succès et une attaque a été lancée"
+//     // );
+//   } catch (error) {
+//     console.error(
+//       "Erreur lors du blocage de tous les clients et de lancement de l'attaque :",
+//       error
+//     );
+//   }
+// };
+
+
+
 exports.runBlockAllClientsOnce = async (req, res) => {
   try {
     // Récupérer les adresses IP des clients à bloquer
-    const { selectedClientIps} = req.body;
+    const { selectedClientIps } = req.body;
 
-    console.log("PARAMETRE  " ,req.body);
+    console.log("PARAMETRE  ", req.body);
 
     const blockStatus = await BlockStatus.findOne();
 
@@ -126,12 +170,14 @@ exports.runBlockAllClientsOnce = async (req, res) => {
 
     // Marquer tous les clients comme bloqués dans la base de données
     await Client.updateMany(
-      { ipAddress: { $in: selectedClientIps} },
+      { ipAddress: { $in: selectedClientIps } },
       { isBlocked: true }
     );
 
     // Exécuter les commandes iptables pour bloquer les clients
-    const blockedClients = await Client.find({ ipAddress: { $in: selectedClientIps } });
+    const blockedClients = await Client.find({
+      ipAddress: { $in: selectedClientIps },
+    });
 
     console.log(blockedClients);
     // return;
@@ -178,7 +224,6 @@ exports.runBlockAllClientsOnce = async (req, res) => {
     res.status(500).json({ message: "Erreur du serveur" });
   }
 };
-
 
 // Exécute blockAllClients toutes les 1000 millisecondes (1 seconde)
 setInterval(async () => {
@@ -292,3 +337,178 @@ exports.unblockClientById = async (req, res) => {
     res.status(500).json({ message: "Erreur du serveur" });
   }
 };
+
+// Démarrer la session pour un client
+exports.startSession = async (req, res) => {
+  try {
+    const { clientId } = req.params;
+    console.log("yESS", clientId);
+    if (!clientId) {
+      return res.status(400).json({ message: "L'ID du client est requis" });
+    }
+
+    const client = await Client.findById(clientId);
+    if (!client) {
+      return res.status(404).json({ message: "Client non trouvé" });
+    }
+
+    // if (client.isRunning) {
+    //   return res.status(400).json({ message: "La session du client est déjà en cours" });
+    // }
+
+    client.startTime = Date.now();
+    client.endTime = null;
+    client.isRunning = true;
+    client.isBlocked = false;
+    await client.save();
+    console.log("yESS", client);
+    res.json({ message: "Session démarrée avec succès", client });
+  } catch (error) {
+    console.error("Erreur lors du démarrage de la session :", error);
+    res.status(500).json({ message: "Erreur du serveur" });
+  }
+};
+
+
+// exports.getClientById = async (req, res) => {
+//   try {
+//     const { clientId } = req.params;
+
+//     if (!clientId) {
+//       return res.status(400).json({ message: "L'ID du client est requis" });
+//     }
+
+//     const client = await Client.findById(clientId);
+//     if (!client) {
+//       return res.status(404).json({ message: "Client non trouvé" });
+//     }
+
+//     res.status(200).json(client);
+//   } catch (error) {
+//     console.error("Erreur lors de la récupération des informations du client :", error);
+//     res.status(500).json({ message: "Erreur du serveur" });
+//   }
+// };
+
+
+exports.getClientByIp = async (req, res) => {
+  try {
+    const { ipAddress } = req.params;
+
+    
+    if (!ipAddress) {
+      return res.status(400).json({ message: "L'adresse IP est requise" });
+    }
+
+    const client = await Client.findOne({ ipAddress });
+    if (!client) {
+      return res.status(404).json({ message: "Client non trouvé" });
+    }
+
+    res.status(200).json(client);
+  } catch (error) {
+    console.error("Erreur lors de la récupération des informations du client :", error);
+    res.status(500).json({ message: "Erreur du serveur" });
+  }
+};
+
+// Stopper la session pour un client
+exports.stopSession = async (req, res) => {
+  try {
+    const { clientId } = req.params;
+
+    console.log("yESS", clientId);
+    if (!clientId) {
+      return res.status(400).json({ message: "L'ID du client est requis" });
+    }
+
+    const client = await Client.findById(clientId);
+    if (!client ) {
+      return res
+        .status(404)
+        .json({ message: "Client non trouvé ou session déjà arrêtée" });
+    }
+
+    client.endTime = Date.now();
+    client.isRunning = false;
+    client.isBlocked = true;
+    // const elapsedTime = Math.floor((client.endTime - client.startTime) / 1000); // Temps en secondes
+    // client.elapsedTime = elapsedTime;
+
+    await client.save();
+
+    res.json({ message: "Session stoppée avec succès", client });
+  } catch (error) {
+    console.error("Erreur lors de l'arrêt de la session :", error);
+    res.status(500).json({ message: "Erreur du serveur" });
+  }
+};
+
+exports.getDashboardData = async (req, res) => {
+  try {
+    const totalClients = await Client.countDocuments();
+    const blockedClients = await Client.countDocuments({
+      isBlocked: true,
+      isRunning: false,
+    });
+    const activeSessions = await Client.countDocuments({ isRunning: true });
+    const totalElapsedTime = await Client.aggregate([
+      { $match: { isRunning: true } },
+      { $group: { _id: null, totalTime: { $sum: "$elapsedTime" } } },
+    ]);
+
+    res.status(200).json({
+      totalClients,
+      blockedClients,
+      activeSessions,
+      totalElapsedTime: totalElapsedTime[0] ? totalElapsedTime[0].totalTime : 0,
+    });
+  } catch (error) {
+    res
+      .status(500)
+      .json({
+        message:
+          "Erreur lors de la récupération des données du tableau de bord",
+        error,
+      });
+  }
+};
+
+
+const calculateElapsedTime = (startTime) => {
+  const now = new Date();
+  const diff = now - new Date(startTime);
+
+  const hours = Math.floor(diff / (1000 * 60 * 60));
+  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+  const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+  return { hours, minutes, seconds }; // Retourne un objet avec heures, minutes et secondes
+};
+
+const updateElapsedTimeInDatabase = async () => {
+  const runningClients = await Client.find({ isRunning: true });
+
+  for (const client of runningClients) {
+    const { hours, minutes, seconds } = calculateElapsedTime(client.startTime);
+
+    // Calculez le coût en fonction du temps écoulé (ex: 20 euros par minute)
+    const totalMinutes = hours * 60 + minutes;
+    const cost = totalMinutes * 20; // Exemple de coût de 20 euros par minute
+
+    // Mettez à jour l'élapsed time et le coût dans la base de données
+    await Client.findByIdAndUpdate(client._id, {
+      elapsedTime: `${hours}:${minutes}:${seconds}`, // Format HH:MM:SS
+      spentCost: cost, // Mettez à jour le coût dépensé
+    });
+  }
+};
+
+
+
+
+// Mettre à jour chaque 10 secondes (ou ajustez l'intervalle selon vos besoins)
+setInterval(updateElapsedTimeInDatabase, 10000);
+
+
+// ClientController.js
